@@ -32,7 +32,8 @@ fn main() {
                                     0 => print!("{out}"),
                                     // exit code
                                     _ => print::print_err_str(
-                                        format!("Exit code: {status}: {err}\n{out}").as_str(),
+                                        format!("error: command exited with code {status}")
+                                            .as_str(),
                                     ),
                                 }
                             }
