@@ -1,4 +1,5 @@
 mod cmd;
+mod parse;
 mod print;
 
 const PROMPT: &str = "$ ";
@@ -15,7 +16,7 @@ fn main() {
         }
 
         // parse command and args
-        match cmd::parse_cmd(input.as_str()) {
+        match parse::parse_cmd(input.as_str()) {
             // parse ok
             Ok((cmd, args)) => {
                 match cmd.as_str() {
@@ -25,13 +26,13 @@ fn main() {
                         // execute command
                         match cmd::exec_cmd(cmd.as_str(), args) {
                             // ok
-                            Ok((status, output)) => {
+                            Ok((status, out, err)) => {
                                 match status {
                                     // success
-                                    0 => print!("{output}"),
+                                    0 => print!("{out}"),
                                     // exit code
                                     _ => print::print_err_str(
-                                        format!("Exit code: {status}: {output}").as_str(),
+                                        format!("Exit code: {status}: {err}\n{out}").as_str(),
                                     ),
                                 }
                             }
