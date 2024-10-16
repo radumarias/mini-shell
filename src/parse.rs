@@ -53,6 +53,12 @@ fn split(line: &str) -> io::Result<Vec<String>> {
     Ok(result)
 }
 
+fn normalize(input: String) -> String {
+    input
+        .replace(['|', '>', '<', '&', ';', '$'], "")
+        .replace("&&", "")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -110,5 +116,16 @@ mod tests {
             ("a".to_string(), vec!["b c".to_string()])
         );
         assert!(parse_cmd("a 'b c").is_err());
+    }
+
+    #[test]
+    fn test_normalize() {
+        assert_eq!(normalize("a b c".to_string()), "a b c".to_string());
+        assert_eq!(normalize("a && b".to_string()), "a  b".to_string());
+        assert_eq!(normalize("a | b".to_string()), "a  b".to_string());
+        assert_eq!(normalize("a > b".to_string()), "a  b".to_string());
+        assert_eq!(normalize("a < b".to_string()), "a  b".to_string());
+        assert_eq!(normalize("a & b".to_string()), "a  b".to_string());
+        assert_eq!(normalize("a ; b".to_string()), "a  b".to_string());
     }
 }
