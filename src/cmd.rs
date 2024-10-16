@@ -1,6 +1,10 @@
 use std::path::Path;
 use std::{env, io};
 
+mod custom_cmd {
+    pub(super) const CMD_CD: &str = "cd";
+}
+
 /// Read command and args.
 pub fn read_cmd() -> (usize, String) {
     let mut input = String::new();
@@ -10,7 +14,7 @@ pub fn read_cmd() -> (usize, String) {
 
 /// Execute a command with args.
 pub fn exec_cmd(cmd: &str, args: Vec<String>) -> io::Result<(i32, String, String)> {
-    if cmd == "cd" {
+    if cmd == custom_cmd::CMD_CD {
         let new_dir = Path::new(args.first().ok_or(io::Error::other("empty args"))?.as_str());
         if !new_dir.exists() {
             return Ok((
@@ -48,5 +52,37 @@ pub fn exec_cmd(cmd: &str, args: Vec<String>) -> io::Result<(i32, String, String
             }
         }
         Err(err) => Err(err),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_exec_ok() {
+        let output = exec_cmd("echo", vec!["hello".to_string()]).unwrap();
+        assert_eq!(output.0, 0);
+        assert_eq!(output.1, "hello\n");
+        assert_eq!(output.2, "");
+    }
+
+    #[test]
+    fn test_exec_err() {
+        let output = exec_cmd("ls", vec!["/nonexistent".to_string()]).unwrap();
+        assert_eq!(output.0, 2);
+        assert_eq!(output.1, "");
+        assert_eq!(
+            output.2,
+            "ls: cannot access '/nonexistent': No such file or directory\n"
+        );
+    }
+
+    #[test]
+    fn test_exec_cd() {
+        let output = exec_cmd("cd", vec!["/".to_string()]).unwrap();
+        assert_eq!(output.0, 0);
+        assert_eq!(output.1, "");
+        assert_eq!(output.2, "");
     }
 }

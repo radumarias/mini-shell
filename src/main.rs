@@ -26,7 +26,7 @@ fn main() {
                         // execute command
                         match cmd::exec_cmd(cmd.as_str(), args) {
                             // ok
-                            Ok((status, out, err)) => {
+                            Ok((status, out, _err)) => {
                                 match status {
                                     // success
                                     0 => print!("{out}"),

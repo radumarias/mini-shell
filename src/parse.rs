@@ -3,6 +3,9 @@ use std::io;
 /// Parse a cmd line in cmd and args.
 pub fn parse_cmd(input: &str) -> io::Result<(String, Vec<String>)> {
     let parts = split(input)?;
+    if parts.is_empty() {
+        return Err(io::Error::other("empty input"));
+    }
     let mut iter = parts.into_iter();
 
     // cmd
@@ -47,8 +50,65 @@ fn split(line: &str) -> io::Result<Vec<String>> {
     if !current.is_empty() {
         result.push(current);
     }
-    if result.is_empty() {
-        return Err(io::Error::other("empty input"));
-    }
     Ok(result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_split() {
+        assert_eq!(split("").unwrap(), Vec::<String>::new());
+        assert_eq!(split("a").unwrap(), vec!["a".to_string()]);
+        assert_eq!(
+            split("a b").unwrap(),
+            vec!["a".to_string(), "b".to_string()]
+        );
+        assert_eq!(
+            split("a \"b\" c").unwrap(),
+            vec!["a".to_string(), "b".to_string(), "c".to_string()]
+        );
+        assert_eq!(
+            split("a 'b' c").unwrap(),
+            vec!["a".to_string(), "b".to_string(), "c".to_string()]
+        );
+        assert_eq!(
+            split("a \"b c\"").unwrap(),
+            vec!["a".to_string(), "b c".to_string()]
+        );
+        assert_eq!(
+            split("a 'b c'").unwrap(),
+            vec!["a".to_string(), "b c".to_string()]
+        );
+        assert!(split("a \"b c").is_err());
+        assert!(split("a 'b c").is_err());
+    }
+
+    #[test]
+    fn test_parse_cmd() {
+        assert!(parse_cmd("").is_err());
+        assert_eq!(parse_cmd("a").unwrap(), ("a".to_string(), vec![]));
+        assert_eq!(
+            parse_cmd("a b").unwrap(),
+            ("a".to_string(), vec!["b".to_string()])
+        );
+        assert_eq!(
+            parse_cmd("a \"b\" c").unwrap(),
+            ("a".to_string(), vec!["b".to_string(), "c".to_string()])
+        );
+        assert_eq!(
+            parse_cmd("a 'b' c").unwrap(),
+            ("a".to_string(), vec!["b".to_string(), "c".to_string()])
+        );
+        assert_eq!(
+            parse_cmd("a \"b c\"").unwrap(),
+            ("a".to_string(), vec!["b c".to_string()])
+        );
+        assert_eq!(
+            parse_cmd("a 'b c'").unwrap(),
+            ("a".to_string(), vec!["b c".to_string()])
+        );
+        assert!(parse_cmd("a 'b c").is_err());
+    }
 }
