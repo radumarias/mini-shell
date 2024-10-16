@@ -31,10 +31,14 @@ fn main() {
                                     // success
                                     0 => print!("{out}"),
                                     // exit code
-                                    _ => print::print_err_str(
-                                        format!("error: command exited with code {status}")
-                                            .as_str(),
-                                    ),
+                                    _ => {
+                                        // todo: maybe we should print err also
+
+                                        print::print_err_str(
+                                            format!("error: command exited with code {status}")
+                                                .as_str(),
+                                        )
+                                    }
                                 }
                             }
                             // failed
