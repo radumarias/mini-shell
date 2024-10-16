@@ -44,6 +44,8 @@ pub fn parse_cmd(input: &str) -> io::Result<(String, Vec<String>)> {
 
 /// Split keeping items inside quotes in one item.
 fn split(args: &str) -> io::Result<Vec<String>> {
+    // todo: split iteratively by each space and using quota as boundary.
+    // like that we can split commands like `/bin/sh -c 'exit 7'`
     let mut split = args.trim().splitn(2, ' ');
     let cmd = split.next();
     let args = split.next();
