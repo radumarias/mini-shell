@@ -53,6 +53,7 @@ fn split(line: &str) -> io::Result<Vec<String>> {
     Ok(result)
 }
 
+/// Any POSIX shell details not specified in this specification should be omitted (e.g. signal handling, pipes, redirection, environment variable expansion, line editing, history, etc.)
 fn normalize(input: String) -> String {
     input
         .replace(['|', '>', '<', '&', ';', '$'], "")
